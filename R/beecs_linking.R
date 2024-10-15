@@ -2,7 +2,7 @@
 # Change path to beecs dir
 beecs_dir <- "/Users/martinovic/git/beecs"
 # Get working directory (directory of R package)
-work_dir <- get_wd()
+work_dir <- getwd()
 # Remove previous headers and compiled objects
 system("rm src/*.so; rm src/*.o; rm src/*.h")
 # system("go clean -cache;go clean -fuzzcache")
@@ -17,8 +17,24 @@ setwd(paste0(work_dir, "/src"))
 # Load shared library executing beecs into R
 dyn.load("beecs.so")
 # Run beecs
-.Call("gobeecs", "{test: [seems to be working]}")
+rows <- 1
+
+definition <- list(
+  InitialPopulation =
+    list(Count = 50000),
+  ForagingPeriod =
+    list(Years = matrix(c(rep(10, 30), rep(0,335)),
+           nrow = rows)),
+  Termination =
+    list(MaxTicks = 800)
+)
+
+json <- jsonlite::toJSON(definition,
+                         auto_unbox = TRUE,
+                         pretty = TRUE)
+
+.Call("gobeecs", json)
 # Unload shared library executing beecs
-dyn.unload("src/beecs.so")
+dyn.unload("beecs.so")
 #Change working directory back to original one
 setwd(work_dir)
