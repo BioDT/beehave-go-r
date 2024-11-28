@@ -38,3 +38,16 @@ json <- jsonlite::toJSON(definition,
 dyn.unload("beecs.so")
 #Change working directory back to original one
 setwd(work_dir)
+
+
+
+
+build_command <- paste0("cd ",
+                        beecs_dir,
+                        ";go build -o ", work_dir, "/inst/lib/macos/libbeecs.so -buildmode=c-shared ./_examples/c_shlib")
+
+
+
+devtools::build(binary = TRUE)
+devtools::install()
+devtools::uninstall()

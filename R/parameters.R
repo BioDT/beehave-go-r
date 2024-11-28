@@ -1,7 +1,7 @@
 #' Add parameters to the Beehave experiment
 #'
-#' @param experiment
-#' @param params
+#' @param experiment a beehave experiment created by beehave_init()
+#' @param params set of input parameters, see details
 #'
 #' @return Return Beehave experiment list
 #' @export
@@ -10,15 +10,58 @@
 add_parameter <- function(experiment, params){
   stopifnot(
     is.list(params),
-    class(experiment) == "beehave.experiment"
+    "beehave.experiment" %in% class(experiment)
   )
 
+  top_level_params <- c(
+    "WorkingDirectory",
+    "Termination",
+    "RandomSeed",
+    "WorkerDevelopment",
+    "DroneDevelopment",
+    "DroneMortality",
+    "WorkerMortality",
+    "DroneMortality",
+    "AgeFirstForaging",
+    "Foragers",
+    "Foraging",
+    "HandlingTime",
+    "Dance",
+    "Stores",
+    "HoneyNeeds",
+    "PollenNeeds",
+    "Nursing",
+    "InitialPopulation",
+    "InitialStores"
+  )
+
+  non_params <- setdiff(
+    names(params),
+    top_level_params
+  )
+
+  if (length(non_params) > 0) {
+    warning(paste0("There are elements which does not belong to the models and will be dropped: ", non_params))
+    params <- params[top_level_params]
+  }
+
   experiment[names(params)] <- params
+
   return(experiment)
 }
 
-default_params <-
-  jsonlite::fromJSON(
+
+#' Print default parameters of the Beehave experiment
+#'
+#' @export
+#'
+#' @examples
+default_params <- function() {
+
+# This print should be beautified with cat and possibility to return default params list should be made
+
+  params <- jsonlite::fromJSON(
+# simplifyVector = FALSE,
 '
 {
 "WorkingDirectory": {
@@ -170,3 +213,7 @@ default_params <-
 }
 '
 )
+
+  print(params)
+  invisible(0)
+}

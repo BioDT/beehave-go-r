@@ -1,6 +1,6 @@
 #' Initialize Beehave experiment
 #'
-#' @param params
+#' @param params list of initial parameters
 #'
 #' @return a list of parameters for Beehave experiment
 #' @export
@@ -16,6 +16,6 @@ beehave_init <- function(params = NULL){
     out <- params
   }
 
-  class(out) <- "beehave.experiment"
+  class(out) <- c("beehave.experiment", "list")
   return(out)
 }
