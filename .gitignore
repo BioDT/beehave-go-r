@@ -63,5 +63,6 @@ rsconnect/
 man
 out
 .aider*
-R/beehave.go.r.code-workspace
-beehave.go.r.Rproj
+*.code-workspace
+*.Rproj
+.Rprofile
