@@ -24,6 +24,10 @@ type SimulationData struct {
 	WorkerCohorts *WorkerData `json:"worker_cohorts,omitempty"` // Data from worker cohorts observer
 	AgeStructure  *WorkerData `json:"age_structure,omitempty"`  // Data from age structure observer
 	Stores        *WorkerData `json:"stores,omitempty"`         // Data from stores observer
+	PatchPollen   *WorkerData `json:"patch_pollen,omitempty"`   // Data from patch pollen observer
+	PatchNectar   *WorkerData `json:"patch_nectar,omitempty"`   // Data from patch nectar observer
+	NectarVisits  *WorkerData `json:"nectar_visits,omitempty"`  // Data from nectar visits observer
+	PollenVisits  *WorkerData `json:"pollen_visits,omitempty"`  // Data from pollen visits observer
 }
 
 // MemoryReporter is a system that collects data from an observer in memory
@@ -180,6 +184,206 @@ func (r *StoresReporter) Update(w *ecs.World) {
 // Finalize implements ecs.System
 func (r *StoresReporter) Finalize(w *ecs.World) {}
 
+// PatchPollenReporter is a system that collects data from the PatchPollen observer
+type PatchPollenReporter struct {
+	observer       obs.PatchPollen
+	data           WorkerData
+	tick           int
+	MaxTimesteps   int // Maximum number of timesteps to keep. Zero means unlimited.
+	UpdateInterval int // Interval for getting data, in model ticks. Optional.
+}
+
+// Initialize implements ecs.System
+func (r *PatchPollenReporter) Initialize(w *ecs.World) {
+	r.observer.Initialize(w)
+	// Add "tick" as the first column
+	columns := append([]string{"tick"}, r.observer.Header()...)
+	r.data = WorkerData{
+		Columns: columns,
+		Data:    make([][]*float64, 0),
+	}
+}
+
+// Update implements ecs.System
+func (r *PatchPollenReporter) Update(w *ecs.World) {
+	if r.UpdateInterval > 0 && r.tick%r.UpdateInterval != 0 {
+		r.tick++
+		return
+	}
+
+	// Get values from the observer
+	values := r.observer.Values(w)
+
+	// Create a new row with tick as the first value
+	row := make([]*float64, len(r.data.Columns))
+	tick := float64(r.tick)
+	row[0] = &tick
+	for i, v := range values {
+		if !math.IsNaN(v) {
+			val := v
+			row[i+1] = &val
+		}
+	}
+
+	// Add the row to the data
+	r.data.Data = append(r.data.Data, row)
+
+	r.tick++
+}
+
+// Finalize implements ecs.System
+func (r *PatchPollenReporter) Finalize(w *ecs.World) {}
+
+// PatchNectarReporter is a system that collects data from the PatchNectar observer
+type PatchNectarReporter struct {
+	observer       obs.PatchNectar
+	data           WorkerData
+	tick           int
+	MaxTimesteps   int // Maximum number of timesteps to keep. Zero means unlimited.
+	UpdateInterval int // Interval for getting data, in model ticks. Optional.
+}
+
+// Initialize implements ecs.System
+func (r *PatchNectarReporter) Initialize(w *ecs.World) {
+	r.observer.Initialize(w)
+	// Add "tick" as the first column
+	columns := append([]string{"tick"}, r.observer.Header()...)
+	r.data = WorkerData{
+		Columns: columns,
+		Data:    make([][]*float64, 0),
+	}
+}
+
+// Update implements ecs.System
+func (r *PatchNectarReporter) Update(w *ecs.World) {
+	if r.UpdateInterval > 0 && r.tick%r.UpdateInterval != 0 {
+		r.tick++
+		return
+	}
+
+	// Get values from the observer
+	values := r.observer.Values(w)
+
+	// Create a new row with tick as the first value
+	row := make([]*float64, len(r.data.Columns))
+	tick := float64(r.tick)
+	row[0] = &tick
+	for i, v := range values {
+		if !math.IsNaN(v) {
+			val := v
+			row[i+1] = &val
+		}
+	}
+
+	// Add the row to the data
+	r.data.Data = append(r.data.Data, row)
+
+	r.tick++
+}
+
+// Finalize implements ecs.System
+func (r *PatchNectarReporter) Finalize(w *ecs.World) {}
+
+// NectarVisitsReporter is a system that collects data from the NectarVisits observer
+type NectarVisitsReporter struct {
+	observer       obs.NectarVisits
+	data           WorkerData
+	tick           int
+	MaxTimesteps   int // Maximum number of timesteps to keep. Zero means unlimited.
+	UpdateInterval int // Interval for getting data, in model ticks. Optional.
+}
+
+// Initialize implements ecs.System
+func (r *NectarVisitsReporter) Initialize(w *ecs.World) {
+	r.observer.Initialize(w)
+	// Add "tick" as the first column
+	columns := append([]string{"tick"}, r.observer.Header()...)
+	r.data = WorkerData{
+		Columns: columns,
+		Data:    make([][]*float64, 0),
+	}
+}
+
+// Update implements ecs.System
+func (r *NectarVisitsReporter) Update(w *ecs.World) {
+	if r.UpdateInterval > 0 && r.tick%r.UpdateInterval != 0 {
+		r.tick++
+		return
+	}
+
+	// Get values from the observer
+	values := r.observer.Values(w)
+
+	// Create a new row with tick as the first value
+	row := make([]*float64, len(r.data.Columns))
+	tick := float64(r.tick)
+	row[0] = &tick
+	for i, v := range values {
+		if !math.IsNaN(v) {
+			val := v
+			row[i+1] = &val
+		}
+	}
+
+	// Add the row to the data
+	r.data.Data = append(r.data.Data, row)
+
+	r.tick++
+}
+
+// Finalize implements ecs.System
+func (r *NectarVisitsReporter) Finalize(w *ecs.World) {}
+
+// PollenVisitsReporter is a system that collects data from the PollenVisits observer
+type PollenVisitsReporter struct {
+	observer       obs.PollenVisits
+	data           WorkerData
+	tick           int
+	MaxTimesteps   int // Maximum number of timesteps to keep. Zero means unlimited.
+	UpdateInterval int // Interval for getting data, in model ticks. Optional.
+}
+
+// Initialize implements ecs.System
+func (r *PollenVisitsReporter) Initialize(w *ecs.World) {
+	r.observer.Initialize(w)
+	// Add "tick" as the first column
+	columns := append([]string{"tick"}, r.observer.Header()...)
+	r.data = WorkerData{
+		Columns: columns,
+		Data:    make([][]*float64, 0),
+	}
+}
+
+// Update implements ecs.System
+func (r *PollenVisitsReporter) Update(w *ecs.World) {
+	if r.UpdateInterval > 0 && r.tick%r.UpdateInterval != 0 {
+		r.tick++
+		return
+	}
+
+	// Get values from the observer
+	values := r.observer.Values(w)
+
+	// Create a new row with tick as the first value
+	row := make([]*float64, len(r.data.Columns))
+	tick := float64(r.tick)
+	row[0] = &tick
+	for i, v := range values {
+		if !math.IsNaN(v) {
+			val := v
+			row[i+1] = &val
+		}
+	}
+
+	// Add the row to the data
+	r.data.Data = append(r.data.Data, row)
+
+	r.tick++
+}
+
+// Finalize implements ecs.System
+func (r *PollenVisitsReporter) Finalize(w *ecs.World) {}
+
 // runBeecs runs a simulation with the given parameters and returns the results as JSON.
 //
 //export runBeecs
@@ -212,6 +416,10 @@ func runBeecs(paramsJSON *C.char) *C.char {
 	var workerReporter *MemoryReporter
 	var ageReporter *AgeStructureReporter
 	var storesReporter *StoresReporter
+	var patchPollenReporter *PatchPollenReporter
+	var patchNectarReporter *PatchNectarReporter
+	var nectarVisitsReporter *NectarVisitsReporter
+	var pollenVisitsReporter *PollenVisitsReporter
 
 	// If no reporters specified, use all
 	if len(inputData.Reporters) == 0 {
@@ -232,6 +440,30 @@ func runBeecs(paramsJSON *C.char) *C.char {
 			UpdateInterval: 1,
 		}
 		m.AddSystem(storesReporter)
+
+		patchPollenReporter = &PatchPollenReporter{
+			MaxTimesteps:   0,
+			UpdateInterval: 1,
+		}
+		m.AddSystem(patchPollenReporter)
+
+		patchNectarReporter = &PatchNectarReporter{
+			MaxTimesteps:   0,
+			UpdateInterval: 1,
+		}
+		m.AddSystem(patchNectarReporter)
+
+		nectarVisitsReporter = &NectarVisitsReporter{
+			MaxTimesteps:   0,
+			UpdateInterval: 1,
+		}
+		m.AddSystem(nectarVisitsReporter)
+
+		pollenVisitsReporter = &PollenVisitsReporter{
+			MaxTimesteps:   0,
+			UpdateInterval: 1,
+		}
+		m.AddSystem(pollenVisitsReporter)
 	} else {
 		// Add only specified reporters
 		for _, name := range inputData.Reporters {
@@ -254,6 +486,30 @@ func runBeecs(paramsJSON *C.char) *C.char {
 					UpdateInterval: 1,
 				}
 				m.AddSystem(storesReporter)
+			case "patch_pollen":
+				patchPollenReporter = &PatchPollenReporter{
+					MaxTimesteps:   0,
+					UpdateInterval: 1,
+				}
+				m.AddSystem(patchPollenReporter)
+			case "patch_nectar":
+				patchNectarReporter = &PatchNectarReporter{
+					MaxTimesteps:   0,
+					UpdateInterval: 1,
+				}
+				m.AddSystem(patchNectarReporter)
+			case "nectar_visits":
+				nectarVisitsReporter = &NectarVisitsReporter{
+					MaxTimesteps:   0,
+					UpdateInterval: 1,
+				}
+				m.AddSystem(nectarVisitsReporter)
+			case "pollen_visits":
+				pollenVisitsReporter = &PollenVisitsReporter{
+					MaxTimesteps:   0,
+					UpdateInterval: 1,
+				}
+				m.AddSystem(pollenVisitsReporter)
 			default:
 				fmt.Printf("Warning: unknown reporter type: %s\n", name)
 			}
@@ -273,6 +529,18 @@ func runBeecs(paramsJSON *C.char) *C.char {
 	}
 	if storesReporter != nil {
 		data.Stores = &storesReporter.data
+	}
+	if patchPollenReporter != nil {
+		data.PatchPollen = &patchPollenReporter.data
+	}
+	if patchNectarReporter != nil {
+		data.PatchNectar = &patchNectarReporter.data
+	}
+	if nectarVisitsReporter != nil {
+		data.NectarVisits = &nectarVisitsReporter.data
+	}
+	if pollenVisitsReporter != nil {
+		data.PollenVisits = &pollenVisitsReporter.data
 	}
 
 	// Convert to JSON
