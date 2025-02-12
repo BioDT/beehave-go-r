@@ -7,42 +7,21 @@
 #' @export
 #'
 #' @examples
-add_parameter <- function(experiment, params){
+add_parameter <- function(experiment, params) {
   stopifnot(
     is.list(params),
     "beehave.experiment" %in% class(experiment)
   )
 
-  top_level_params <- c(
-    "WorkingDirectory",
-    "Termination",
-    "RandomSeed",
-    "WorkerDevelopment",
-    "DroneDevelopment",
-    "DroneMortality",
-    "WorkerMortality",
-    "DroneMortality",
-    "AgeFirstForaging",
-    "Foragers",
-    "Foraging",
-    "HandlingTime",
-    "Dance",
-    "Stores",
-    "HoneyNeeds",
-    "PollenNeeds",
-    "Nursing",
-    "InitialPopulation",
-    "InitialStores"
-  )
+  default_params <- get_default_params()
 
-  non_params <- setdiff(
-    names(params),
-    top_level_params
-  )
+  non_params <- setdiff(names(params), names(default_params))
 
   if (length(non_params) > 0) {
-    warning(paste0("There are elements which does not belong to the models and will be dropped: ", non_params))
-    params <- params[top_level_params]
+    warning(paste0(
+      "There are elements which do not belong to the models and will not be used: ",
+      paste0(non_params, collapse = ", ")
+    ))
   }
 
   experiment[names(params)] <- params
@@ -50,19 +29,17 @@ add_parameter <- function(experiment, params){
   return(experiment)
 }
 
-
 #' Print default parameters of the Beehave experiment
 #'
 #' @export
 #'
 #' @examples
-default_params <- function() {
-
-# This print should be beautified with cat and possibility to return default params list should be made
+get_default_params <- function() {
+  # This print should be beautified with cat and possibility to return default params list should be made
 
   params <- jsonlite::fromJSON(
-# simplifyVector = FALSE,
-'
+    # simplifyVector = FALSE,
+    '
 {
 "WorkingDirectory": {
   "Path": "."
@@ -212,8 +189,41 @@ default_params <- function() {
 }
 }
 '
-)
+  )
+}
 
-  print(params)
-  invisible(0)
+#' Check if parameters differ from default values
+#'
+#' @param params list of parameters to check
+#' @param ignore_params optional character vector of parameter paths to ignore in comparison
+#'
+#' @return Named logical vector indicating which top-level parameters have changed from defaults
+#' @export
+#'
+#' @examples
+#' # Check all parameters
+#' has_changed_params(my_params)
+#'
+#' # Ignore specific parameters in comparison
+#' has_changed_params(my_params, ignore_params = c("WorkingDirectory", "RandomSeed"))
+has_changed_params <- function(params, ignore_params = character(0)) {
+  # Get default parameters
+  defaults <- get_default_params()
+  # Get top-level parameter names
+  param_names <- setdiff(names(defaults), ignore_params)
+  # Initialize result vector
+  changes <- logical(length(param_names))
+  names(changes) <- param_names
+  # Compare each top-level parameter
+  for (param in param_names) {
+    if (param %in% names(params)) {
+      # Check if parameter exists and is different from default
+      changes[param] <- !identical(params[[param]], defaults[[param]])
+    } else {
+      # Parameter not present in input, mark as unchanged
+      changes[param] <- FALSE
+    }
+  }
+
+  return(changes)
 }

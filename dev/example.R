@@ -1,11 +1,12 @@
 library(beehave.go.r)
 
-weather_vector <-  matrix(
-  c(rep(10, 30),
-    rep(0,335)),
+weather_vector <- matrix(
+  c(
+    rep(10, 30),
+    rep(0, 335)
+  ),
   nrow = 1
-  )
-
+)
 
 # Source all R scripts
 experiment <- beehave_init() |>
@@ -15,13 +16,15 @@ experiment <- beehave_init() |>
       Termination = list(MaxTicks = 800)
     )
   ) |>
-  add_weather(
+  add_weather_vector(
     weather_vector = weather_vector
-  ) |>
-  jsonlite::toJSON(
-    auto_unbox = TRUE,
-    pretty = TRUE
-  ) #|> as.character()
+  ) #|>
+  # jsonlite::toJSON(
+  #   auto_unbox = TRUE,
+  #   pretty = TRUE
+  # ) #|> as.character()
+
+print(experiment)
 
 beehave.go.r::run_simulation(experiment)
 # beehave.go.r:::gobeecs

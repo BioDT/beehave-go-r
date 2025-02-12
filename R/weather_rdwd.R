@@ -6,9 +6,10 @@
 
 # Function to create a weatherinput file for the beehave model
 #' @export
-weather_rdwd <- function(bee_location,
-                         from_date = "2016-01-01",
-                         to_date = "2016-12-31") {
+weather_rdwd <- function(
+    bee_location,
+    from_date = "2016-01-01",
+    to_date = "2016-12-31") {
   # transform input coordinates to degrees
   TrachtnetConv <- terra::project(bee_location, "epsg:4326")
   Coordinates <- as.data.frame(terra::crds(TrachtnetConv))
@@ -27,14 +28,17 @@ weather_rdwd <- function(bee_location,
     dplyr::filter(von_datum < from_date)
 
   # check through the stations for NA values in data
-  for (i in 1:nrow(WeatherStations)) {
+  for (i in seq_along(WeatherStations)) {
     weather_data <-
       rdwd::dataDWD(WeatherStations$url[i],
-                    varnames = TRUE,
-                    quiet = TRUE) |>
-      dplyr::select(MESS_DATUM,
-                    SDK.Sonnenscheindauer,
-                    TXK.Lufttemperatur_Max) |>
+        varnames = TRUE,
+        quiet = TRUE
+      ) |>
+      dplyr::select(
+        MESS_DATUM,
+        SDK.Sonnenscheindauer,
+        TXK.Lufttemperatur_Max
+      ) |>
       # dplyr::mutate(MESS_DATUM = rdwd::as_date(MESS_DATUM)) |>
       dplyr::filter(
         MESS_DATUM >= as.POSIXct(from_date, tz = "GMT"),
@@ -42,9 +46,10 @@ weather_rdwd <- function(bee_location,
       )
 
     # breaks when file with no NAs in SDK found
-    if (anyNA(weather_data$SDK.Sonnenscheindauer) == FALSE &
-        length(weather_data$SDK.Sonnenscheindauer) > 0)
+    if (anyNA(weather_data$SDK.Sonnenscheindauer) == FALSE &&
+      length(weather_data$SDK.Sonnenscheindauer) > 0) {
       break
+    }
 
     # if all stations contain NA values give warning
     if (i == length(WeatherStations$Stations_id)) {
@@ -59,12 +64,14 @@ weather_rdwd <- function(bee_location,
 
   # Add station id and day number
   weather_data <- weather_data |>
-    dplyr::rename(Date = MESS_DATUM,
-                  T_max = TXK.Lufttemperatur_Max,
-                  Sun_hours = SDK.Sonnenscheindauer) |>
+    dplyr::rename(
+      Date = MESS_DATUM,
+      T_max = TXK.Lufttemperatur_Max,
+      Sun_hours = SDK.Sonnenscheindauer
+    ) |>
     dplyr::mutate(
       Station_id = WeatherStations$Stations_id[i],
-      Day = 1:dplyr::n(),
+      Day = seq_along(dplyr::n()),
       .before = Date
     ) |>
     # Use only sun hours where max temperature is above 15 degrees celsium
