@@ -18,8 +18,8 @@ experiment <- beehave_init() |>
   ) |>
   add_weather_vector(
     weather_vector = weather_vector
-  ) |>
-  add_parameter(list(reporters = list("worker_cohorts")))
+  ) #|>
+  # add_parameter(list(reporters = list("worker_cohorts", "stores")))
 
 # print(experiment)
 

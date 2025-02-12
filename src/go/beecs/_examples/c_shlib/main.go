@@ -15,7 +15,6 @@ import (
 
 // WorkerData represents the worker cohorts data in a tabular format
 type WorkerData struct {
-	Name    string       `json:"name"`    // Name of the observer
 	Columns []string     `json:"columns"` // Column names including "tick"
 	Data    [][]*float64 `json:"data"`    // 2D array of data, including tick as first column
 }
@@ -24,6 +23,7 @@ type WorkerData struct {
 type SimulationData struct {
 	WorkerCohorts *WorkerData `json:"worker_cohorts,omitempty"` // Data from worker cohorts observer
 	AgeStructure  *WorkerData `json:"age_structure,omitempty"`  // Data from age structure observer
+	Stores        *WorkerData `json:"stores,omitempty"`         // Data from stores observer
 }
 
 // MemoryReporter is a system that collects data from an observer in memory
@@ -130,6 +130,56 @@ func (r *AgeStructureReporter) Update(w *ecs.World) {
 // Finalize implements ecs.System
 func (r *AgeStructureReporter) Finalize(w *ecs.World) {}
 
+// StoresReporter is a system that collects data from the Stores observer
+type StoresReporter struct {
+	observer       obs.Stores
+	data           WorkerData
+	tick           int
+	MaxTimesteps   int // Maximum number of timesteps to keep. Zero means unlimited.
+	UpdateInterval int // Interval for getting data, in model ticks. Optional.
+}
+
+// Initialize implements ecs.System
+func (r *StoresReporter) Initialize(w *ecs.World) {
+	r.observer.Initialize(w)
+	// Add "tick" as the first column
+	columns := append([]string{"tick"}, r.observer.Header()...)
+	r.data = WorkerData{
+		Columns: columns,
+		Data:    make([][]*float64, 0),
+	}
+}
+
+// Update implements ecs.System
+func (r *StoresReporter) Update(w *ecs.World) {
+	if r.UpdateInterval > 0 && r.tick%r.UpdateInterval != 0 {
+		r.tick++
+		return
+	}
+
+	// Get values from the observer
+	values := r.observer.Values(w)
+
+	// Create a new row with tick as the first value
+	row := make([]*float64, len(r.data.Columns))
+	tick := float64(r.tick)
+	row[0] = &tick
+	for i, v := range values {
+		if !math.IsNaN(v) {
+			val := v
+			row[i+1] = &val
+		}
+	}
+
+	// Add the row to the data
+	r.data.Data = append(r.data.Data, row)
+
+	r.tick++
+}
+
+// Finalize implements ecs.System
+func (r *StoresReporter) Finalize(w *ecs.World) {}
+
 // runBeecs runs a simulation with the given parameters and returns the results as JSON.
 //
 //export runBeecs
@@ -161,6 +211,7 @@ func runBeecs(paramsJSON *C.char) *C.char {
 	// Create reporters
 	var workerReporter *MemoryReporter
 	var ageReporter *AgeStructureReporter
+	var storesReporter *StoresReporter
 
 	// If no reporters specified, use all
 	if len(inputData.Reporters) == 0 {
@@ -168,15 +219,19 @@ func runBeecs(paramsJSON *C.char) *C.char {
 			MaxTimesteps:   0,
 			UpdateInterval: 1,
 		}
-		workerReporter.data.Name = "worker_cohorts"
 		m.AddSystem(workerReporter)
 
 		ageReporter = &AgeStructureReporter{
 			MaxTimesteps:   0,
 			UpdateInterval: 1,
 		}
-		ageReporter.data.Name = "age_structure"
 		m.AddSystem(ageReporter)
+
+		storesReporter = &StoresReporter{
+			MaxTimesteps:   0,
+			UpdateInterval: 1,
+		}
+		m.AddSystem(storesReporter)
 	} else {
 		// Add only specified reporters
 		for _, name := range inputData.Reporters {
@@ -186,15 +241,19 @@ func runBeecs(paramsJSON *C.char) *C.char {
 					MaxTimesteps:   0,
 					UpdateInterval: 1,
 				}
-				workerReporter.data.Name = "worker_cohorts"
 				m.AddSystem(workerReporter)
 			case "age_structure":
 				ageReporter = &AgeStructureReporter{
 					MaxTimesteps:   0,
 					UpdateInterval: 1,
 				}
-				ageReporter.data.Name = "age_structure"
 				m.AddSystem(ageReporter)
+			case "stores":
+				storesReporter = &StoresReporter{
+					MaxTimesteps:   0,
+					UpdateInterval: 1,
+				}
+				m.AddSystem(storesReporter)
 			default:
 				fmt.Printf("Warning: unknown reporter type: %s\n", name)
 			}
@@ -211,6 +270,9 @@ func runBeecs(paramsJSON *C.char) *C.char {
 	}
 	if ageReporter != nil {
 		data.AgeStructure = &ageReporter.data
+	}
+	if storesReporter != nil {
+		data.Stores = &storesReporter.data
 	}
 
 	// Convert to JSON
