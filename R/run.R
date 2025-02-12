@@ -1,32 +1,51 @@
 #' Run simulation
 #'
-#' @useDynLib beehave.go.r gobeecs
+#' @useDynLib beehave.go.r run_beecs
 #' @param experiment a beehave experiment created by beehave_init()
 #'
-#' @return Return 0
+#' @return A list containing worker cohorts data for each timestep
 #' @export
 #'
-#' @importFrom jsonlite toJSON
+#' @importFrom jsonlite toJSON fromJSON
 #'
 #' @examples
 #' \dontrun{
 #' # Create experiment with specified parameters
 #' experiment <- beehave_init(params = list(InitialPopulation = list(Count = 50000)))
-#' run_simulation(experiment)
+#' results <- run_simulation(experiment)
 #' }
-run_simulation <- function(
-    experiment) {
-  experiment <- experiment |>
-    jsonlite::toJSON(
+run_simulation <- function(experiment) {
+  # Convert parameters to JSON
+  tryCatch({
+    params_json <- jsonlite::toJSON(
+      experiment,
       auto_unbox = TRUE,
-      pretty = TRUE
-    ) #|> as.character()
+      pretty = TRUE,
+      null = "null"  # Ensure proper handling of NULL values
+    )
+  }, error = function(e) {
+    stop("Failed to convert parameters to JSON: ", e$message)
+  })
 
-  res <- .Call(
-    "gobeecs",
-    experiment,
+  # Run simulation and get JSON data
+  json_data <- .Call(
+    "run_beecs",
+    params_json,
     PACKAGE = "beehave.go.r"
   )
 
-  return(0)
+  if (is.null(json_data)) {
+    stop("Simulation failed")
+  }
+
+  # Parse JSON into R list
+  tryCatch({
+    jsonlite::fromJSON(
+      json_data,
+      simplifyVector = TRUE,  # Convert arrays to matrices where possible
+      simplifyDataFrame = FALSE  # Don't convert to data frames
+    )
+  }, error = function(e) {
+    stop("Failed to parse simulation results: ", e$message)
+  })
 }

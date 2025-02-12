@@ -22,4 +22,4 @@ experiment <- beehave_init() |>
 
 print(experiment)
 
-beehave.go.r::run_simulation(experiment)
+test <- beehave.go.r::run_simulation(experiment)

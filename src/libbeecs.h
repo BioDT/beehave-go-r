@@ -74,7 +74,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern GoInt runbeecs(char* str_params);
+extern char* runBeecs(char* paramsJSON);
 
 #ifdef __cplusplus
 }
