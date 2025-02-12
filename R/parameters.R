@@ -7,6 +7,12 @@
 #' @export
 #'
 #' @examples
+#' # Create an empty experiment
+#' experiment <- beehave_init()
+#'
+#' # Add parameters to the experiment
+#' experiment <- add_parameter(experiment, list(InitialPopulation = list(Count = 50000)))
+#' print(experiment)
 add_parameter <- function(experiment, params) {
   stopifnot(
     is.list(params),
@@ -29,11 +35,15 @@ add_parameter <- function(experiment, params) {
   return(experiment)
 }
 
-#' Print default parameters of the Beehave experiment
+#' Get default parameters of the Beehave experiment
 #'
 #' @export
 #'
+#' @importFrom jsonlite fromJSON
+#'
 #' @examples
+#' default_parameters <- get_default_params()
+#' print(default_parameters)
 get_default_params <- function() {
   # This print should be beautified with cat and possibility to return default params list should be made
 
@@ -190,22 +200,26 @@ get_default_params <- function() {
 }
 '
   )
+
+  return(params)
 }
 
-#' Check if parameters differ from default values
+#' Check if parameters differ from defaults
 #'
-#' @param params list of parameters to check
-#' @param ignore_params optional character vector of parameter paths to ignore in comparison
+#' @param params List of parameters to check against defaults
+#' @param ignore_params Character vector of parameter names to ignore in the comparison
 #'
 #' @return Named logical vector indicating which top-level parameters have changed from defaults
 #' @export
 #'
 #' @examples
-#' # Check all parameters
-#' has_changed_params(my_params)
+#' # Check if parameters differ from defaults
+#' params <- list(InitialPopulation = list(Count = 50000))
+#' has_changed_params(params)
 #'
-#' # Ignore specific parameters in comparison
-#' has_changed_params(my_params, ignore_params = c("WorkingDirectory", "RandomSeed"))
+#' # Ignore certain parameters in the comparison
+#' has_changed_params(params, ignore_params = c("InitialPopulation"))
+#'
 has_changed_params <- function(params, ignore_params = character(0)) {
   # Get default parameters
   defaults <- get_default_params()

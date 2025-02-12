@@ -1,11 +1,30 @@
-###### R - script to create input (resources and weather) files to run the BEEHAVE model
-# main contributor Anna Wendt, University of Freiburg
-# contributor of an earlier version of the WeatherDataInput() function Okan Özsoy
-# modifications have been done by Jürgen Groeneveld, Tomas Martinovic, Tuomas Rossi
-# the honeybee pDT has benefited from the work of the honeybee pDT team
-
-# Function to create a weatherinput file for the beehave model
-#' @export
+#' Fetch Weather Data from German Weather Service (DWD)
+#'
+#' This function retrieves weather data from the German Weather Service (DWD) for a specified
+#' location and time period. It finds the nearest weather station within a 50km radius and
+#' returns daily sunshine duration data, considering only hours where the maximum temperature
+#' is above 15 degrees Celsius.
+#'
+#' @param bee_location A spatial object (e.g., SpatVector) containing the location coordinates
+#' @param from_date Character string specifying the start date in "YYYY-MM-DD" format. Default is "2016-01-01"
+#' @param to_date Character string specifying the end date in "YYYY-MM-DD" format. Default is "2016-12-31"
+#'
+#' @return A numeric vector of daily sunshine duration values (in hours), where values are set
+#'         to 0 for days with maximum temperature below 15°C
+#'
+#' @details The function first converts the input coordinates to WGS84 (EPSG:4326), then
+#'          searches for nearby weather stations. It prioritizes stations with complete data
+#'          (no NA values) for the specified time period. If all stations within 50km contain
+#'          NA values, a warning is issued.
+#'
+#'          Original creator Anna Wendt, University of Freiburg
+#'          Contributor of an earlier version of the WeatherDataInput() function Okan Özsoy
+#'          Modifications have been done by Jürgen Groeneveld, Tomas Martinovic, Tuomas Rossi
+#'
+#' @importFrom rdwd nearbyStations dataDWD
+#' @importFrom terra project crds
+#' @importFrom dplyr filter select mutate rename n
+#'
 weather_rdwd <- function(
     bee_location,
     from_date = "2016-01-01",

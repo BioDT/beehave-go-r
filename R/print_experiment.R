@@ -87,7 +87,7 @@ print.beehave.experiment <- function(
         params <- experiment[selected_params]
     } else {
         params <- experiment
-    } # nolint: indentation_linter.
+    }
 
     # Check which parameters have changed from defaults
     changed <- has_changed_params(params, ignore_params)

@@ -12,7 +12,47 @@
 #' @return Return Beehave experiment list
 #' @export
 #'
+#' @details
+#' The function supports two ways to add flower patches:
+#' 1. Using a landuse map with lookup table ("map" type)
+#' 2. Using a direct list of flower patches ("list" type)
+#'
+#' For the "map" type, you need to provide:
+#' - A landuse map (GeoTIFF format)
+#' - A lookup table that maps landuse codes to flower patch properties
+#' - Location(s) for which to extract the flower patches
+#'
+#' For the "list" type, provide a list of flower patches directly through flower_patches_list.
+#'
 #' @examples
+#' # Create an empty experiment
+#' experiment <- beehave_init()
+#'
+#' # Example 1: Using a landuse map
+#' add_flower_patches(
+#'   experiment,
+#'   landuse_map = "path/to/landuse.tif",
+#'   locations = data.frame(lat = 48.0, lon = 7.8),
+#'   lookup_file = "path/to/lookup.csv"
+#' )
+#'
+#' # Example 2: Using a direct list of flower patches
+#' patches <- list(
+#'   list(
+#'     Distance = 500,
+#'     Size = 1000,
+#'     StartDay = 1,
+#'     EndDay = 365,
+#'     NectarPerDay = 0.1,
+#'     PollenPerDay = 0.1
+#'   )
+#' )
+#' add_flower_patches(
+#'   experiment,
+#'   flower_patches_list = patches,
+#'   type = "list"
+#' )
+#'
 add_flower_patches <- function(
     experiment,
     landuse_map = NULL,
