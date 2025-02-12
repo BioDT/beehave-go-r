@@ -58,6 +58,10 @@ rsconnect/
 
 # End of https://www.toptal.com/developers/gitignore/api/R
 
-.Rproj.user
+.Rproj
 .DS_Store
 man
+out
+.aider*
+R/beehave.go.r.code-workspace
+beehave.go.r.Rproj
