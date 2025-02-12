@@ -74,6 +74,9 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
+
+// runBeecs runs a simulation with the given parameters and returns the results as JSON.
+//
 extern char* runBeecs(char* paramsJSON);
 
 #ifdef __cplusplus
