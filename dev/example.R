@@ -18,13 +18,8 @@ experiment <- beehave_init() |>
   ) |>
   add_weather_vector(
     weather_vector = weather_vector
-  ) #|>
-  # jsonlite::toJSON(
-  #   auto_unbox = TRUE,
-  #   pretty = TRUE
-  # ) #|> as.character()
+  )
 
 print(experiment)
 
 beehave.go.r::run_simulation(experiment)
-# beehave.go.r:::gobeecs
