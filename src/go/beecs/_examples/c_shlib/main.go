@@ -423,96 +423,64 @@ func runBeecs(paramsJSON *C.char) *C.char {
 
 	// If no reporters specified, use all
 	if len(inputData.Reporters) == 0 {
-		workerReporter = &MemoryReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
+		inputData.Reporters = []string{
+			"worker_cohorts",
+			"age_structure",
+			"stores",
+			"patch_pollen",
+			"patch_nectar",
+			"nectar_visits",
+			"pollen_visits",
 		}
-		m.AddSystem(workerReporter)
+	}
 
-		ageReporter = &AgeStructureReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(ageReporter)
-
-		storesReporter = &StoresReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(storesReporter)
-
-		patchPollenReporter = &PatchPollenReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(patchPollenReporter)
-
-		patchNectarReporter = &PatchNectarReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(patchNectarReporter)
-
-		nectarVisitsReporter = &NectarVisitsReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(nectarVisitsReporter)
-
-		pollenVisitsReporter = &PollenVisitsReporter{
-			MaxTimesteps:   0,
-			UpdateInterval: 1,
-		}
-		m.AddSystem(pollenVisitsReporter)
-	} else {
-		// Add only specified reporters
-		for _, name := range inputData.Reporters {
-			switch name {
-			case "worker_cohorts":
-				workerReporter = &MemoryReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(workerReporter)
-			case "age_structure":
-				ageReporter = &AgeStructureReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(ageReporter)
-			case "stores":
-				storesReporter = &StoresReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(storesReporter)
-			case "patch_pollen":
-				patchPollenReporter = &PatchPollenReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(patchPollenReporter)
-			case "patch_nectar":
-				patchNectarReporter = &PatchNectarReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(patchNectarReporter)
-			case "nectar_visits":
-				nectarVisitsReporter = &NectarVisitsReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(nectarVisitsReporter)
-			case "pollen_visits":
-				pollenVisitsReporter = &PollenVisitsReporter{
-					MaxTimesteps:   0,
-					UpdateInterval: 1,
-				}
-				m.AddSystem(pollenVisitsReporter)
-			default:
-				fmt.Printf("Warning: unknown reporter type: %s\n", name)
+	// Add specified reporters
+	for _, name := range inputData.Reporters {
+		switch name {
+		case "worker_cohorts":
+			workerReporter = &MemoryReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
 			}
+			m.AddSystem(workerReporter)
+		case "age_structure":
+			ageReporter = &AgeStructureReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(ageReporter)
+		case "stores":
+			storesReporter = &StoresReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(storesReporter)
+		case "patch_pollen":
+			patchPollenReporter = &PatchPollenReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(patchPollenReporter)
+		case "patch_nectar":
+			patchNectarReporter = &PatchNectarReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(patchNectarReporter)
+		case "nectar_visits":
+			nectarVisitsReporter = &NectarVisitsReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(nectarVisitsReporter)
+		case "pollen_visits":
+			pollenVisitsReporter = &PollenVisitsReporter{
+				MaxTimesteps:   0,
+				UpdateInterval: 1,
+			}
+			m.AddSystem(pollenVisitsReporter)
+		default:
+			fmt.Printf("Warning: unknown reporter type: %s\n", name)
 		}
 	}
 
