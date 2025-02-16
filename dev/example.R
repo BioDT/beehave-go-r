@@ -10,17 +10,27 @@ weather_vector <- matrix(
 
 # Source all R scripts
 experiment <- beehave_init() |>
-  add_parameter(
-    list(
-      InitialPopulation = list(Count = 50000),
-      Termination = list(MaxTicks = 800)
-    )
+  add_weather_file(
+    "dev/data/weather_1.txt"
   ) |>
-  add_weather_vector(
-    weather_vector = weather_vector
-  ) #|>
-  # add_parameter(list(reporters = list("worker_cohorts", "stores")))
+  # add_parameter(
+  #   list(
+  #     InitialPopulation = list(Count = 50000),
+  #     Termination = list(MaxTicks = 800)
+  #   )
+  # ) |>
+  # add_weather_vector(
+  #   weather_vector = weather_vector
+  # )# |>
+  add_parameter(list(reporters = c(
+    "worker_cohorts",
+    "stores"
+  )))
 
-# print(experiment)
+print(experiment)
+experiment$InitialPatches <- NULL
 
 test <- beehave.go.r::run_simulation(experiment)
+
+bcs_plot_series(test,
+                group = "stores")
