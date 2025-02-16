@@ -131,7 +131,7 @@ get_default_params <- function() {
 },
 "EnergyContent": {
   "Honey":   12.78,
-  "Scurose": 0.00582
+  "Sucrose": 0.00582
 },
 "Stores": {
   "IdealPollenStoreDays": 7,
@@ -200,7 +200,11 @@ get_default_params <- function() {
 }
 '
   )
-
+  params[["reporters"]] <-
+    c(
+      "worker_cohorts",
+      "stores"
+    )
   return(params)
 }
 
