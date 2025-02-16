@@ -3,4 +3,5 @@ PKG_LIBS = -L. -lbeecs
 all: libbeecs.so $(SHLIB)
 
 libbeecs.so: go/beecs/_examples/c_shlib/main.go
+	go env -w GOPROXY=https://proxy.golang.org,direct
 	cd go/beecs/_examples/c_shlib && go build  -modcacherw -buildmode=c-archive -o ../../../../libbeecs.a main.go
