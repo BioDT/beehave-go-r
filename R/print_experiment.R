@@ -96,15 +96,20 @@ print.beehave.experiment <- function(
     cat("\nBeehave Experiment Parameters:\n")
     cat("==========================\n\n")
 
-    # Get all parameter names
+    # Get all parameter names, including custom ones
     param_names <- names(params)
+
+    # Get default parameter names for comparison
+    default_params <- names(get_default_params())
 
     for (param in param_names) {
         # Skip parameters that should be ignored
         if (param %in% ignore_params) next
 
-        # Print parameter name with change indicator
-        if (param %in% names(changed) && changed[param]) {
+        # Print parameter name with change indicator and custom flag
+        if (!(param %in% default_params)) {
+            cat(sprintf("+ %s (custom):\n", param))
+        } else if (param %in% names(changed) && changed[param]) {
             cat(sprintf("* %s (modified):\n", param))
         } else {
             cat(sprintf("  %s:\n", param))
@@ -114,8 +119,39 @@ print.beehave.experiment <- function(
         param_value <- params[[param]]
         if (is.list(param_value)) {
             # For nested parameters, print each on new line
-            for (subparam in names(param_value)) {
-                cat(sprintf("    %s: %s\n", subparam, param_value[[subparam]]))
+            if (param == "ForagingPeriod") {
+                # Special handling for ForagingPeriod
+                printed_values <- list()
+                for (subparam in names(param_value)) {
+                    if (subparam %in% names(printed_values)) {
+                        printed_values[[subparam]] <- c(printed_values[[subparam]], param_value[[subparam]])
+                    } else {
+                        printed_values[[subparam]] <- param_value[[subparam]]
+                    }
+                }
+                # Print combined values for ForagingPeriod
+                for (subparam in names(printed_values)) {
+                    values <- printed_values[[subparam]]
+                    cat(sprintf("    %s: %s\n", subparam, paste(values, collapse = " ")))
+                }
+            } else {
+                # Normal handling for other parameters
+                for (subparam in names(param_value)) {
+                    if (is.list(param_value[[subparam]])) {
+                        # Handle nested lists (like arrays)
+                        cat(sprintf("    %s:\n", subparam))
+                        for (item in param_value[[subparam]]) {
+                            cat(sprintf("      - %s\n", item))
+                        }
+                    } else {
+                        cat(sprintf("    %s: %s\n", subparam, param_value[[subparam]]))
+                    }
+                }
+            }
+        } else if (is.vector(param_value) && length(param_value) > 1) {
+            # For vectors, print each element on a new line
+            for (item in param_value) {
+                cat(sprintf("    - %s\n", item))
             }
         } else {
             # For simple parameters, print directly
