@@ -74,11 +74,14 @@ add_weather_file <- function(
       stringr::str_split(" ",
         simplify = TRUE
       ) |>
-      as.integer() |>
+      as.numeric() |>
+      # as.integer() |>
       na.omit()
   }
 
-  weather_input <- list(Years = weather_vector)
+  weather_length <- length(weather_vector)
+  weather_ind <- 1:(floor(weather_length / 365) * 365)
+  weather_input <- list(Years = matrix(weather_vector[weather_ind], nrow = 1))
 
   experiment[["ForagingPeriod"]] <- weather_input
 
