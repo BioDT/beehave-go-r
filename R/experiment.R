@@ -28,7 +28,7 @@ beehave_init <- function(
   out <- list()
 
   if (add_default) {
-    out <- add_parameter(out, get_default_params())
+    out <- get_default_params()
   }
 
   if (!is.null(params)) {
