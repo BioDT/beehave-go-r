@@ -1,6 +1,11 @@
 package params
 
-import "github.com/mlange-42/beecs/comp"
+import (
+	"bytes"
+	"encoding/json"
+
+	"github.com/mlange-42/beecs/comp"
+)
 
 type WorkingDirectory struct {
 	Path string
@@ -110,7 +115,7 @@ type DroneMortality struct {
 // EnergyContent parameters.
 type EnergyContent struct {
 	Honey   float64 // Energy content of honey [kJ/g].
-	Scurose float64 // Energy content of sucrose [kJ/micromol].
+	Sucrose float64 // Energy content of sucrose [kJ/micromol].
 }
 
 // HoneyNeeds parameters.
@@ -150,6 +155,7 @@ type Stores struct {
 	IdealPollenStoreDays int     // Number of days the pollen store should ideally last for [d].
 	MinIdealPollenStore  float64 // Minimum pollen store to consider ideal [g].
 	MaxHoneyStoreKg      float64 // Maximum honey store [kg].
+	DecentHoneyPerWorker float64 // Honey needed per worker to consider stores decent [g].
 	ProteinStoreNurse    float64 // Number of days nurse protein stores lasts [d].
 }
 
@@ -172,6 +178,30 @@ type InitialStores struct {
 type InitialPatches struct {
 	Patches []comp.PatchConfig // Initial patches. Optional.
 	File    string             // File to read patches from. Applied after creating Patches.
+}
+
+// initialPatchesHelper is used to unmarshal the InitialPatches struct from JSON,
+// properly overwriting the default patches.
+type initialPatchesHelper struct {
+	Patches []comp.PatchConfig // Initial patches. Optional.
+	File    string             // File to read patches from. Applied after creating Patches.
+}
+
+func (p *InitialPatches) UnmarshalJSON(jsonData []byte) error {
+	helper := initialPatchesHelper{}
+	reader := bytes.NewReader(jsonData)
+	decoder := json.NewDecoder(reader)
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(&helper)
+	if err != nil {
+		return err
+	}
+
+	p.File = helper.File
+	p.Patches = helper.Patches
+
+	return nil
 }
 
 // ForagingPeriod parameters.

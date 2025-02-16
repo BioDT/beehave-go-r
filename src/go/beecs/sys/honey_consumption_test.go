@@ -36,6 +36,14 @@ func TestHoneyConsumption(t *testing.T) {
 		Drone:            9,
 	})
 
+	ecs.AddResource(&world, &params.Stores{
+		IdealPollenStoreDays: 7,
+		MinIdealPollenStore:  250.0,
+		MaxHoneyStoreKg:      50.0,
+		DecentHoneyPerWorker: 1.5,
+		ProteinStoreNurse:    7,
+	})
+
 	stores := globals.Stores{
 		Honey:  100_000,
 		Pollen: 100_000,
@@ -44,7 +52,7 @@ func TestHoneyConsumption(t *testing.T) {
 
 	ecs.AddResource(&world, &params.EnergyContent{
 		Honey:   12.78,
-		Scurose: 0.00582,
+		Sucrose: 0.00582,
 	})
 	ecs.AddResource(&world, &params.Nursing{
 		MaxBroodNurseRatio: 3.0,
