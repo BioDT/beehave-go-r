@@ -205,6 +205,7 @@ get_default_params <- function() {
       "worker_cohorts",
       "stores"
     )
+
   return(params)
 }
 
