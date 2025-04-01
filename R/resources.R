@@ -98,6 +98,8 @@ add_flower_patches <- function(
 #' }
 #'
 #' @importFrom terra rast vect project crs cells as.polygons disagg set.values
+#' @importFrom terra buffer crop cats values expanse subset centroids crds distance ext mask
+#' @importFrom utils read.csv
 
 add_flower_patches_from_map <- function(
   experiment,
@@ -128,18 +130,18 @@ flower_patches_from_map <- function(
   polygon_size = 200000
 ) {
   # Read input map
-  input_map <- rast(landuse_map)
+  input_map <- terra::rast(landuse_map)
 
   # Convert and project location
-  bee_location <- vect(
+  bee_location <- terra::vect(
     location,
     crs = "EPSG:4326"
   ) |>
-    project(crs(input_map))
+    terra::project(terra::crs(input_map))
 
   # Read lookup table
   if (is.character(lookup_table)) {
-    lookup_table_df <- read.csv(lookup_table)
+    lookup_table_df <- utils::read.csv(lookup_table)
   } else {
     lookup_table_df <- lookup_table
   }
@@ -148,20 +150,20 @@ flower_patches_from_map <- function(
   patch_types <- lookup_table_df$PatchType
 
   # Create buffer around bee location
-  clip_buffer <- buffer(
+  clip_buffer <- terra::buffer(
     bee_location,
     width = buffer_size
   )
 
   # Clip raster to buffer
-  location_area <- crop(
+  location_area <- terra::crop(
     input_map,
     clip_buffer
   )
 
   # Filter raster to only include categories in the lookup table
   # First, get the mapping of values to categories
-  map_categories <- cats(location_area)[[1]]
+  map_categories <- terra::cats(location_area)[[1]]
 
   # Find values that match our patch types
   valid_values <- map_categories$value[map_categories$category %in% patch_types]
@@ -173,19 +175,19 @@ flower_patches_from_map <- function(
   }
 
   # Mark non-matching values as NA to exclude them
-  non_matching <- unique(values(location_area)) |>
+  non_matching <- unique(terra::values(location_area)) |>
     setdiff(valid_values) |>
     as.numeric()
 
-  set.values(
+  terra::set.values(
     location_area,
-    unlist(cells(location_area, non_matching)),
+    unlist(terra::cells(location_area, non_matching)),
     NA
   )
 
   # Convert raster to polygons and disaggregate
-  location_polygons <- as.polygons(location_area) |>
-    disagg()
+  location_polygons <- terra::as.polygons(location_area) |>
+    terra::disagg()
 
   # Initialize list to hold flower patches
   flower_patches <- list()
@@ -197,20 +199,20 @@ flower_patches_from_map <- function(
   }
 
   # Add initial attributes
-  poly_values <- values(location_polygons)
+  poly_values <- terra::values(location_polygons)
   poly_attrs <- data.frame(
-    id = 1:nrow(poly_values),
+    id = seq_len(nrow(poly_values)),
     PatchType = poly_values,
-    size_sqm = expanse(location_polygons)
+    size_sqm = terra::expanse(location_polygons)
   )
-  values(location_polygons) <- poly_attrs
+  terra::values(location_polygons) <- poly_attrs
 
   # Process polygons by patch type
   for (patch in patch_types) {
     # Get polygons of this type
-    type_polys <- subset(
+    type_polys <- terra::subset(
       location_polygons,
-      values(location_polygons)$category == patch
+      terra::values(location_polygons)$category == patch
     )
 
     # Skip if none found
@@ -219,9 +221,9 @@ flower_patches_from_map <- function(
     }
 
     # Process each polygon of this type
-    for (i in 1:nrow(type_polys)) {
+    for (i in seq_len(nrow(type_polys))) {
       single_poly <- type_polys[i]
-      single_area <- expanse(single_poly)
+      single_area <- terra::expanse(single_poly)
 
       if (single_area > polygon_size) {
         # Split large polygons
@@ -232,9 +234,9 @@ flower_patches_from_map <- function(
           n_subpolys <- length(sub_polys)
           sub_vals <- data.frame(
             PatchType = rep(patch, n_subpolys),
-            size_sqm = expanse(sub_polys)
+            size_sqm = terra::expanse(sub_polys)
           )
-          values(sub_polys) <- sub_vals
+          terra::values(sub_polys) <- sub_vals
 
           # Process each subpolygon
           for (j in 1:n_subpolys) {
@@ -242,12 +244,12 @@ flower_patches_from_map <- function(
 
             # Calculate distance to hive
             dist <- distance(
-              centroids(sub_poly),
+              terra::centroids(sub_poly),
               bee_location
             )[1]
 
             # Get coordinates of centroid
-            center <- crds(centroids(sub_poly))
+            center <- terra::crds(terra::centroids(sub_poly))
 
             # Get nectar, pollen, and other attributes from lookup table
             patch_info <- lookup_table_df[
@@ -276,12 +278,12 @@ flower_patches_from_map <- function(
         }
       } else {
         # Process small polygon directly
-        dist <- distance(
-          centroids(single_poly),
+        dist <- terra::distance(
+          terra::centroids(single_poly),
           bee_location
         )[1]
 
-        center <- crds(centroids(single_poly))
+        center <- terra::crds(terra::centroids(single_poly))
 
         patch_info <- lookup_table_df[lookup_table_df$PatchType == patch, ]
 
@@ -316,17 +318,17 @@ flower_patches_from_map <- function(
 #' @param target_size Target size of subpolygons in square meters
 #'
 #' @return SpatVector of subpolygons
-#' @export
-#' @importFrom terra rast ext expanse crs as.polygons mask
+#' @importFrom terra rast ext expanse crs as.polygons mask subset
+
 split_polygon <- function(
   poly,
   target_size
 ) {
   # Get polygon's extent
-  poly_ext <- ext(poly)
+  poly_ext <- terra::ext(poly)
 
   # Calculate grid dimensions based on aspect ratio
-  poly_area <- expanse(poly)
+  poly_area <- terra::expanse(poly)
   num_cells <- ceiling(poly_area / target_size)
 
   width <- xmax(poly_ext) - xmin(poly_ext)
@@ -346,24 +348,24 @@ split_polygon <- function(
   }
 
   # Create grid raster
-  grid <- rast(
+  grid <- terra::rast(
     ext = poly_ext,
     nrows = rows,
     ncols = cols,
-    crs = crs(poly)
+    crs = terra::crs(poly)
   )
 
   # Fill with cell IDs
-  values(grid) <- 1:(rows * cols)
+  terra::values(grid) <- 1:(rows * cols)
 
   # Mask by original polygon
-  grid <- mask(grid, poly)
+  grid <- terra::mask(grid, poly)
 
   # Convert to polygons
-  grid_polys <- as.polygons(grid)
+  grid_polys <- terra::as.polygons(grid)
 
   # Remove NAs (cells outside the original polygon)
-  grid_polys <- subset(grid_polys, !is.na(values(grid_polys)))
+  grid_polys <- terra::subset(grid_polys, !is.na(values(grid_polys)))
 
   # Return the grid polygons
   return(grid_polys)
