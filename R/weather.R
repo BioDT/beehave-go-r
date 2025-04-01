@@ -33,12 +33,15 @@
 #' experiment <- add_weather_vector(experiment, weather_vector)
 #'
 add_weather_vector <- function(
-    experiment,
-    weather_vector = NULL) {
+  experiment,
+  weather_vector = NULL
+) {
+  # Reshape weather vector to multiple of 365
+  weather_length <- length(weather_vector)
+  weather_ind <- 1:(floor(weather_length / 365) * 365)
+  weather_input <- list(Years = matrix(weather_vector[weather_ind], nrow = 1))
 
-  weather_input <- list(Years = weather_vector)
-
-  experiment[["ForagingPeriod"]] <- weather_input
+  experiment["ForagingPeriod"] <- weather_input
 
   return(experiment)
 }
@@ -65,20 +68,20 @@ add_weather_vector <- function(
 #' print(experiment)
 #' }
 add_weather_file <- function(
-    experiment,
-    weather_file,
-    weather_file_type = "beehave_legacy") {
+  experiment,
+  weather_file,
+  weather_file_type = "beehave_legacy"
+) {
   if (weather_file_type == "beehave_legacy") {
     # Load weather data ----
     weather_vector <- readr::read_file(weather_file) |>
-      stringr::str_split(" ",
-        simplify = TRUE
-      ) |>
+      stringr::str_split(" ", simplify = TRUE) |>
       as.numeric() |>
       # as.integer() |>
       na.omit()
   }
 
+  # Reshape weather vector to multiple of 365
   weather_length <- length(weather_vector)
   weather_ind <- 1:(floor(weather_length / 365) * 365)
   weather_input <- list(Years = matrix(weather_vector[weather_ind], nrow = 1))
@@ -109,11 +112,12 @@ add_weather_file <- function(
 #' print(experiment)
 #' }
 add_weather_location <- function(
-    experiment,
-    start_date = "2016-01-01",
-    days = 365,
-    location,
-    source = "rdwd") {
+  experiment,
+  start_date = "2016-01-01",
+  days = 365,
+  location,
+  source = "rdwd"
+) {
   if (
     !is.null(start_date) &&
       is.numeric(days) &&
@@ -128,7 +132,12 @@ add_weather_location <- function(
     )
   }
 
-  weather_input <- list(Years = weather_vector)
+  # Reshape weather vector to multiple of 365
+  weather_length <- length(weather_vector)
+  weather_ind <- 1:(floor(weather_length / 365) * 365)
+  weather_input <- list(Years = matrix(weather_vector[weather_ind], nrow = 1))
 
   experiment[["ForagingPeriod"]] <- weather_input
+
+  return(experiment)
 }
