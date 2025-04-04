@@ -165,7 +165,7 @@ plot_flower_patches <- function(
 #' @return A tmap object
 #' @export
 #'
-#' @importFrom terra vect project crs rbind values
+#' @importFrom terra vect project crs values
 #' @importFrom tmap tm_shape tm_polygons tm_dots tm_compass tm_scale tm_layout tmap_mode
 #' @importFrom sf st_as_sf
 plot_patches <- function(
@@ -200,7 +200,7 @@ plot_patches <- function(
   }
 
   # Combine all polygons into one SpatVector with a type attribute
-  all_polygons <- do.call(terra::rbind, patch_polygons)
+  all_polygons <- do.call(rbind, patch_polygons)
   terra::values(all_polygons) <- data.frame(PatchType = patch_types)
 
   # Set default colors if not provided
