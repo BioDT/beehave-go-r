@@ -3,9 +3,26 @@ Title: Beehave R Wrapper
 Version: 0.0.0.9000
 Authors@R:
     person("Tomas", "Martinovic", , "tomas.martinovic@vsb.cz", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           comment = c(ORCID = "0000-0002-0132-1434"))
+Description: An R interface to the 'beecs' honeybee colony simulation model. This package 
+    provides tools for setting up, running, and visualizing honeybee colony simulations 
+    using the Go-based 'beecs' framework. It allows users to configure weather conditions, 
+    flower patches, and other environmental parameters to study bee colony dynamics and 
+    behavior in various scenarios.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports:
+    terra,
+    tmap,
+    sf,
+    dplyr,
+    utils,
+    jsonlite,
+    echarty,
+    stringr,
+    readr
+Suggests:
+    rdwd
+SystemRequirements: Go (>= 1.18)
