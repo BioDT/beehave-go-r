@@ -16,8 +16,3 @@ libbeecs.so: main.go
 	go mod download github.com/mlange-42/beecs
 	go mod tidy
 	go build  -modcacherw -buildmode=c-archive -o libbeecs.a main.go
-
-clean:
-	rm -f *.o *.so *.a *.h go.mod go.sum
-
-.PHONY: clean
