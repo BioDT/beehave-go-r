@@ -1,0 +1,8 @@
+#!/bin/sh
+# Cleanup script for beehave-go-r package
+# This script is automatically executed by R CMD INSTALL --clean
+# and by R CMD build when preparing the package
+
+cd src
+rm -f *.o *.so *.a *.h go.mod go.sum
+echo "Cleaned up temporary files in src directory"
