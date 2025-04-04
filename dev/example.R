@@ -9,14 +9,14 @@ weather_vector <- matrix(
 )
 
 # Source all R scripts
-experiment2 <- beehave_init(add_default = FALSE) |>
+experiment <- beehave_init(add_default = FALSE) |>
   add_weather_file(
     "dev/data/weather_402.txt"
   ) |>
   add_flower_patches_from_map(
     landuse_map = "dev/data/preidl-etal-RSE-2020_land-cover-classification-germany-2016.tif",
     lookup_table = "dev/data/NectarPollenLookUp.csv",
-    location = data.frame(lat = 48.0, lon = 7.8)
+    location = data.frame(lat = 48.2, lon = 7.8)
   ) |>
   add_parameter(
     list(
@@ -50,7 +50,8 @@ experiment2 <- beehave_init(add_default = FALSE) |>
     )
   )
 
-print(experiment2)
-test <- run_simulation(experiment2)
+plot_flower_patches(experiment)
+print(experiment)
+test <- run_simulation(experiment)
 
 bcs_plot_series(test, group = "stores")

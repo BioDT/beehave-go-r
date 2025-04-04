@@ -24,6 +24,7 @@ run_simulation <- function(experiment) {
     for (i in seq_along(experiment$InitialPatches$Patches)) {
       # Remove PatchType field (used only for visualization)
       experiment$InitialPatches$Patches[[i]]$PatchType <- NULL
+      experiment$InitialPatches$Patches[[i]]$PatchPolygon <- NULL
 
       # Remove Coords field but store it for later reference if needed
       if (!is.null(experiment$InitialPatches$Patches[[i]]$Coords)) {

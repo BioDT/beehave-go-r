@@ -243,7 +243,7 @@ flower_patches_from_map <- function(
             sub_poly <- sub_polys[j]
 
             # Calculate distance to hive
-            dist <- distance(
+            dist <- terra::distance(
               terra::centroids(sub_poly),
               bee_location
             )[1]
@@ -299,7 +299,8 @@ flower_patches_from_map <- function(
             X = center[1],
             Y = center[2]
           ),
-          PatchType = patch
+          PatchType = patch,
+          PatchPolygon = single_poly
         )
 
         flower_patches <- c(flower_patches, list(patch_entry))
@@ -318,7 +319,7 @@ flower_patches_from_map <- function(
 #' @param target_size Target size of subpolygons in square meters
 #'
 #' @return SpatVector of subpolygons
-#' @importFrom terra rast ext expanse crs as.polygons mask subset
+#' @importFrom terra rast ext expanse crs as.polygons mask subset xmax xmin ymax ymin
 
 split_polygon <- function(
   poly,
@@ -331,8 +332,8 @@ split_polygon <- function(
   poly_area <- terra::expanse(poly)
   num_cells <- ceiling(poly_area / target_size)
 
-  width <- xmax(poly_ext) - xmin(poly_ext)
-  height <- ymax(poly_ext) - ymin(poly_ext)
+  width <- terra::xmax(poly_ext) - terra::xmin(poly_ext)
+  height <- terra::ymax(poly_ext) - terra::ymin(poly_ext)
 
   aspect <- width / height
   rows <- round(sqrt(num_cells / aspect))
@@ -365,7 +366,7 @@ split_polygon <- function(
   grid_polys <- terra::as.polygons(grid)
 
   # Remove NAs (cells outside the original polygon)
-  grid_polys <- terra::subset(grid_polys, !is.na(values(grid_polys)))
+  grid_polys <- terra::subset(grid_polys, !is.na(terra::values(grid_polys)))
 
   # Return the grid polygons
   return(grid_polys)
