@@ -7,6 +7,10 @@ The go version is based on the [Beehave model](https://beehave-model.net/) which
 
 ## Installation
 
+Currently the package is only available on BioDT Github.
+
+### Prerequisites
+
 During the installation a go module will be downloaded and compiled.
 For this You need to have a go installed on Your system.
 See [Go](https://golang.org/dl/) for more information.
@@ -88,3 +92,4 @@ In this example weather is being read from original beehave weather file.
 - [ ] Complete visualisation of experiment results based on the user defined reporters
 - [ ] Shiny App
 - [ ] More examples
+- [ ] Compiled packages for Windows and MacOS
