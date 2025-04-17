@@ -50,6 +50,7 @@ experiment <- beehave_init(add_default = FALSE) |>
     )
   )
 
+
 plot_flower_patches(experiment)
 print(experiment)
 test <- run_simulation(experiment)
