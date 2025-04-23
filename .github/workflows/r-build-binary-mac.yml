@@ -2,11 +2,6 @@ name: Build Mac Binary R Packages
 
 on:
   workflow_dispatch:
-    inputs:
-      r-versions:
-        description: 'Comma-separated list of R versions to build for (e.g., "4.3.3,4.4.3")'
-        required: false
-        default: '4.4.3'
   release:
     types: [created]
 
@@ -16,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r-version: ${{ fromJson('[' + (inputs.r-versions || '4.4.3') + ']') }}
+        r-version: ["4.4.3"]
     
     steps:
       - uses: actions/checkout@v4
