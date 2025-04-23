@@ -15,6 +15,9 @@ During the installation a go module will be downloaded and compiled.
 For this You need to have a go installed on Your system.
 See [Go](https://golang.org/dl/) for more information.
 
+On Windows You also need to have Rtools installed.
+See [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for more information for Your version of R.
+
 ```R
 install.packages("remotes")
 remotes::install_github("biodt/beehave-go-r")
