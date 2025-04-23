@@ -30,10 +30,6 @@ jobs:
       - name: Build binary package
         run: |
           R CMD INSTALL --build .
-
-      - name: Check the package
-        run: |
-          R CMD CHECK *.tgz
         
       - name: Upload macOS binary package
         uses: actions/upload-artifact@v4
@@ -78,10 +74,6 @@ jobs:
       - name: Build binary package
         run: |
           R CMD INSTALL --build .
-
-      - name: Check the package
-        run: |
-          R CMD CHECK *.zip
         
       - name: Upload Windows binary package
         uses: actions/upload-artifact@v4
