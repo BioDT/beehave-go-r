@@ -2,8 +2,10 @@ name: Build Mac Binary R Packages
 
 on:
   workflow_dispatch:
-  release:
-    types: [created]
+    inputs:
+      release_tag:
+        description: 'Release tag to attach the binary to (e.g., "2025-04-23")'
+        required: true
 
 jobs:
   build-macos:
@@ -48,3 +50,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: beehave.go.r_${{ env.RVERSION }}_macos_arm64.tgz
+          tag_name: ${{ github.event.inputs.release_tag }}
