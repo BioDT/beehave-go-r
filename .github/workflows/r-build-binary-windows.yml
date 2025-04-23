@@ -19,11 +19,6 @@ jobs:
         with:
           r-version: '4.4.3'
           
-      - name: Setup Rtools
-        uses: r-lib/actions/setup-rtools@v2
-        with:
-          rtools-version: '44'
-          
       - name: Install R package dependencies
         run: |
           install.packages(c("remotes", "pkgbuild", "desc"))
