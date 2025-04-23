@@ -65,8 +65,6 @@ out
 .aider*
 *.code-workspace
 *.Rproj
-src/go.mod
-src/go.sum
 src/beecs.o
 src/libbeecs.a
 src/libbeecs.h
