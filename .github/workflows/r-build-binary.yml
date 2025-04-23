@@ -41,13 +41,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: beehave-go-r-macos
-          path: ./*.tgz
+          path: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
           
       - name: Create Release and Upload Asset (if tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: ./*.tgz
+          files: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
           
   build-windows:
     runs-on: windows-latest
@@ -81,10 +81,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: beehave-go-r-windows
-          path: ./*.zip
+          path: "D:/a/beehave-go-r/beehave.go.r_*.zip"
           
       - name: Create Release and Upload Asset (if tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: ./*.zip
+          files: "D:/a/beehave-go-r/beehave.go.r_*.zip"
