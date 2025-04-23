@@ -20,14 +20,6 @@
 #' # Create an empty experiment
 #' experiment <- beehave_init()
 #'
-#' add_flower_patches(
-#'   experiment,
-#'   landuse_map = "path/to/landuse.tif",
-#'   locations = data.frame(lat = 48.0, lon = 7.8),
-#'   lookup_file = "path/to/lookup.csv"
-#' )
-#'
-#' # Example 2: Using a direct list of flower patches
 #' patches <- list(
 #'     list(
 #'       DistToColony = 1000,
@@ -49,11 +41,13 @@
 #'       )
 #'     )
 #'   )
-#' add_flower_patches(
+#'
+#' experiment <- add_flower_patches(
 #'   experiment,
-#'   flower_patches_list = patches,
-#'   type = "list"
+#'   flower_patches_list = patches
 #' )
+#'
+#' print(experiment)
 #'
 add_flower_patches <- function(
   experiment,
@@ -68,10 +62,13 @@ add_flower_patches <- function(
 
 #' Convert landuse map to flower patches
 #'
-#' @param landuse_map a path to the landuse map tif
-#' @param locations set of locations for experiments in lat/lon format
-#' @param lookup_table a lookup table for the flower patches, or a path to the lookup table file
-#' #'
+#' @param experiment a beehave experiment created by beehave_init()
+#' @param landuse_map A path to the landuse map GeoTIFF file
+#' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
+#' @param location A data frame with lat and lon columns specifying the location for experiments
+#' @param buffer_size The buffer size in meters around the location (default: 2000)
+#' @param polygon_size The maximum size of polygons in square meters (default: 200000)
+#'
 #' @return Return Beehave experiment list
 #' @export
 #'
@@ -121,6 +118,22 @@ add_flower_patches_from_map <- function(
   return(experiment)
 }
 
+#' Convert landuse map to flower patches
+#'
+#' This function processes a landuse map and converts it into flower patches
+#' based on the provided lookup table and location information.
+#'
+#' @param landuse_map A path to the landuse map GeoTIFF file
+#' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
+#' @param location A data frame with lat and lon columns specifying the location for experiments
+#' @param buffer_size The buffer size in meters around the location (default: 2000)
+#' @param polygon_size The maximum size of polygons in square meters (default: 200000)
+#'
+#' @return A list of flower patches
+#'
+#' @importFrom terra rast vect project crs cells as.polygons disagg set.values
+#' @importFrom terra buffer crop cats values expanse subset centroids crds distance ext mask
+#' @importFrom utils read.csv
 
 flower_patches_from_map <- function(
   landuse_map,

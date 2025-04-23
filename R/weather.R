@@ -60,7 +60,7 @@ add_weather_vector <- function(
 #'
 #' @examples
 #' # Create an empty experiment
-#' /dontrun{
+#' \dontrun{
 #' experiment <- beehave_init()
 #'
 #' # Add weather to the experiment

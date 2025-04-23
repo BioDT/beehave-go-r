@@ -24,11 +24,13 @@
 #' @importFrom rdwd nearbyStations dataDWD
 #' @importFrom terra project crds
 #' @importFrom dplyr filter select mutate rename n
+#' @importFrom stats na.omit runif setNames
 #'
 weather_rdwd <- function(
-    bee_location,
-    from_date = "2016-01-01",
-    to_date = "2016-12-31") {
+  bee_location,
+  from_date = "2016-01-01",
+  to_date = "2016-12-31"
+) {
   # transform input coordinates to degrees
   TrachtnetConv <- terra::project(bee_location, "epsg:4326")
   Coordinates <- as.data.frame(terra::crds(TrachtnetConv))
@@ -49,10 +51,7 @@ weather_rdwd <- function(
   # check through the stations for NA values in data
   for (i in seq_along(WeatherStations)) {
     weather_data <-
-      rdwd::dataDWD(WeatherStations$url[i],
-        varnames = TRUE,
-        quiet = TRUE
-      ) |>
+      rdwd::dataDWD(WeatherStations$url[i], varnames = TRUE, quiet = TRUE) |>
       dplyr::select(
         MESS_DATUM,
         SDK.Sonnenscheindauer,
@@ -65,8 +64,10 @@ weather_rdwd <- function(
       )
 
     # breaks when file with no NAs in SDK found
-    if (anyNA(weather_data$SDK.Sonnenscheindauer) == FALSE &&
-      length(weather_data$SDK.Sonnenscheindauer) > 0) {
+    if (
+      anyNA(weather_data$SDK.Sonnenscheindauer) == FALSE &&
+        length(weather_data$SDK.Sonnenscheindauer) > 0
+    ) {
       break
     }
 

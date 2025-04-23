@@ -1,17 +1,20 @@
 #' Print Beehave experiment settings
 #'
-#' @param experiment a beehave experiment created by beehave_init()
+#' @param x a beehave experiment created by beehave_init()
 #' @param groups list of parameter groups or specific parameters to show. If NULL, all parameters are shown.
 #'              Can be a list with elements:
 #'              - groups: character vector of predefined groups ("system", "development", "mortality",
 #'                "foraging", "resource_handling", "resource_management", "colony_management")
 #'              - params: character vector of specific parameter names
 #' @param ignore_params parameters to ignore when checking for changes
+#' @param ... additional arguments passed to print
 #'
 #' @return Return Beehave experiment list invisibly
 #' @export
 #'
 #' @examples
+#' experiment <- beehave_init(add_default = TRUE)
+#'
 #' # Print all parameters
 #' print(experiment)
 #'
@@ -30,19 +33,31 @@
 #' # Print ignoring certain parameters when checking for changes
 #' print(experiment, ignore_params = c("WorkingDirectory", "RandomSeed"))
 print.beehave.experiment <- function(
-    experiment,
+    x,
     groups = NULL,
-    ignore_params = character(0)) {
-    stopifnot("beehave.experiment" %in% class(experiment))
+    ignore_params = character(0),
+    ...
+) {
+    stopifnot("beehave.experiment" %in% class(x))
 
     # Define parameter groups
     param_groups <- list(
         system = c("WorkingDirectory", "Termination", "RandomSeed"),
         development = c("WorkerDevelopment", "DroneDevelopment"),
         mortality = c("WorkerMortality", "DroneMortality"),
-        foraging = c("AgeFirstForaging", "Foragers", "Foraging", "ForagingPeriod"),
+        foraging = c(
+            "AgeFirstForaging",
+            "Foragers",
+            "Foraging",
+            "ForagingPeriod"
+        ),
         resource_handling = c("HandlingTime", "Dance"),
-        resource_management = c("EnergyContent", "Stores", "HoneyNeeds", "PollenNeeds"),
+        resource_management = c(
+            "EnergyContent",
+            "Stores",
+            "HoneyNeeds",
+            "PollenNeeds"
+        ),
         colony_management = c("Nursing")
     )
 
@@ -50,7 +65,9 @@ print.beehave.experiment <- function(
     if (!is.null(groups)) {
         # Validate groups structure
         if (!is.list(groups)) {
-            stop("'groups' must be a list with optional elements 'groups' and 'params'")
+            stop(
+                "'groups' must be a list with optional elements 'groups' and 'params'"
+            )
         }
 
         # Initialize empty vectors for parameters
@@ -61,7 +78,10 @@ print.beehave.experiment <- function(
         if ("groups" %in% names(groups)) {
             invalid_groups <- setdiff(groups$groups, names(param_groups))
             if (length(invalid_groups) > 0) {
-                stop("Invalid group names: ", paste(invalid_groups, collapse = ", "))
+                stop(
+                    "Invalid group names: ",
+                    paste(invalid_groups, collapse = ", ")
+                )
             }
             group_params <- unique(unlist(param_groups[groups$groups]))
         }
@@ -76,17 +96,22 @@ print.beehave.experiment <- function(
 
         # Validate all parameters exist
         if (length(selected_params) == 0) {
-            stop("No parameters selected. Specify either 'groups' or 'params' in the groups list.")
+            stop(
+                "No parameters selected. Specify either 'groups' or 'params' in the groups list."
+            )
         }
 
-        invalid_params <- setdiff(selected_params, names(experiment))
+        invalid_params <- setdiff(selected_params, names(x))
         if (length(invalid_params) > 0) {
-            warning("Invalid parameters: ", paste(invalid_params, collapse = ", "))
+            warning(
+                "Invalid parameters: ",
+                paste(invalid_params, collapse = ", ")
+            )
         }
 
-        params <- experiment[selected_params]
+        params <- x[selected_params]
     } else {
-        params <- experiment
+        params <- x
     }
 
     # Check which parameters have changed from defaults
@@ -124,7 +149,10 @@ print.beehave.experiment <- function(
                 printed_values <- list()
                 for (subparam in names(param_value)) {
                     if (subparam %in% names(printed_values)) {
-                        printed_values[[subparam]] <- c(printed_values[[subparam]], param_value[[subparam]])
+                        printed_values[[subparam]] <- c(
+                            printed_values[[subparam]],
+                            param_value[[subparam]]
+                        )
                     } else {
                         printed_values[[subparam]] <- param_value[[subparam]]
                     }
@@ -132,7 +160,11 @@ print.beehave.experiment <- function(
                 # Print combined values for ForagingPeriod
                 for (subparam in names(printed_values)) {
                     values <- printed_values[[subparam]]
-                    cat(sprintf("    %s: %s\n", subparam, paste(values, collapse = " ")))
+                    cat(sprintf(
+                        "    %s: %s\n",
+                        subparam,
+                        paste(values, collapse = " ")
+                    ))
                 }
             } else {
                 # Normal handling for other parameters
@@ -144,7 +176,11 @@ print.beehave.experiment <- function(
                             cat(sprintf("      - %s\n", item))
                         }
                     } else {
-                        cat(sprintf("    %s: %s\n", subparam, param_value[[subparam]]))
+                        cat(sprintf(
+                            "    %s: %s\n",
+                            subparam,
+                            param_value[[subparam]]
+                        ))
                     }
                 }
             }
@@ -160,5 +196,5 @@ print.beehave.experiment <- function(
         cat("\n")
     }
 
-    invisible(experiment)
+    invisible(x)
 }
