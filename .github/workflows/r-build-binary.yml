@@ -29,8 +29,11 @@ jobs:
         
       - name: Build binary package
         run: |
-          pkgbuild::build(binary = TRUE, vignettes = FALSE)
-        shell: Rscript {0}
+          R CMD INSTALL --build .
+
+      - name: Check the package
+        run: |
+          R CMD CHECK *.tar.gz
         
       - name: Upload macOS binary package
         uses: actions/upload-artifact@v4
@@ -69,8 +72,11 @@ jobs:
         
       - name: Build binary package
         run: |
-          pkgbuild::build(binary = TRUE, vignettes = FALSE)
-        shell: Rscript {0}
+          R CMD INSTALL --build .
+
+      - name: Check the package
+        run: |
+          R CMD CHECK *.zip
         
       - name: Upload Windows binary package
         uses: actions/upload-artifact@v4
