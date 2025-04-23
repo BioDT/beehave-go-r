@@ -22,7 +22,6 @@ Imports:
     jsonlite,
     echarty,
     stringr,
-    readr
-Suggests:
+    readr,
     rdwd
-SystemRequirements: Go (>= 1.18)
+SystemRequirements: Go (>= 1.21)
