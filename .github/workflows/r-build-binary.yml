@@ -1,0 +1,90 @@
+name: Build Binary R Packages
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.18'
+          
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          
+      - name: Install R package dependencies
+        run: |
+          install.packages(c("remotes", "pkgbuild", "desc"))
+          deps <- desc::desc_get_deps()
+          pkgs <- deps[deps$type %in% c("Imports", "Depends", "LinkingTo"), "package"]
+          remotes::install_cran(pkgs)
+        shell: Rscript {0}
+        
+      - name: Build binary package
+        run: |
+          pkgbuild::build(binary = TRUE, vignettes = FALSE)
+        shell: Rscript {0}
+        
+      - name: Upload macOS binary package
+        uses: actions/upload-artifact@v3
+        with:
+          name: beehave-go-r-macos
+          path: ./*.tgz
+          
+      - name: Create Release and Upload Asset (if tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./*.tgz
+          
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.18'
+          
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          
+      - name: Install R package dependencies
+        run: |
+          install.packages(c("remotes", "pkgbuild", "desc"))
+          deps <- desc::desc_get_deps()
+          pkgs <- deps[deps$type %in% c("Imports", "Depends", "LinkingTo"), "package"]
+          remotes::install_cran(pkgs)
+        shell: Rscript {0}
+        
+      - name: Build binary package
+        run: |
+          pkgbuild::build(binary = TRUE, vignettes = FALSE)
+        shell: Rscript {0}
+        
+      - name: Upload Windows binary package
+        uses: actions/upload-artifact@v3
+        with:
+          name: beehave-go-r-windows
+          path: ./*.zip
+          
+      - name: Create Release and Upload Asset (if tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./*.zip
