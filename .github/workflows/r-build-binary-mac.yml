@@ -2,10 +2,22 @@ name: Build Mac Binary R Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      r-versions:
+        description: 'Comma-separated list of R versions to build for (e.g., "4.3.3,4.4.3")'
+        required: false
+        default: '4.4.3'
+  release:
+    types: [created]
 
 jobs:
   build-macos:
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        r-version: ${{ fromJson('[' + (inputs.r-versions || '4.4.3') + ']') }}
+    
     steps:
       - uses: actions/checkout@v4
       
@@ -15,9 +27,10 @@ jobs:
           go-version: '1.21'
           
       - name: Set up R
+        id: setup-r
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: '4.4.3'
+          r-version: ${{ matrix.r-version }}
           
       - name: Install R package dependencies
         run: |
@@ -30,15 +43,13 @@ jobs:
       - name: Build binary package
         run: R CMD INSTALL --build .
         
-      - name: Upload macOS binary package
-        uses: actions/upload-artifact@v4
-        with:
-          name: beehave-go-r-macos
-          path: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
+      - name: Set r-version variable
+        run: echo "RVERSION=${{ matrix.r-version }}" >> $GITHUB_ENV
+
+      - name: Rename macOS binary package
+        run: mv beehave.go.r_*.tgz beehave.go.r_${{ env.RVERSION }}_macos_arm64.tgz
           
-      - name: Create Release and Upload Asset (if tag)
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
-          
+          files: beehave.go.r_${{ env.RVERSION }}_macos_arm64.tgz
