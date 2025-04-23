@@ -1,0 +1,21 @@
+PKG_LIBS = -L. -lbeecs
+
+all: libbeecs.a $(SHLIB)
+
+libbeecs.a: main.go
+	go env -w GOPROXY=https://proxy.golang.org,direct
+	echo module beehave-go-r > go.mod
+	echo. >> go.mod
+	echo go 1.18 >> go.mod
+	echo. >> go.mod
+	echo require ( >> go.mod
+	echo 	github.com/mlange-42/arche v0.14.0 >> go.mod
+	echo 	github.com/mlange-42/beecs v0.5.0 >> go.mod
+	echo ) >> go.mod
+	go mod download github.com/mlange-42/arche
+	go mod download github.com/mlange-42/beecs
+	go mod tidy
+	go build -modcacherw -buildmode=c-archive -o libbeecs.a main.go
+
+clean:
+	rm -f *.o *.so *.a *.h go.mod go.sum
