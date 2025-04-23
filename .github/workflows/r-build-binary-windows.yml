@@ -1,14 +1,14 @@
-name: Build Mac Binary R Packages
+name: Build Windows Binary R Packages
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  build-windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      
+          
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -18,6 +18,11 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: '4.4.3'
+          
+      - name: Setup Rtools
+        uses: r-lib/actions/setup-rtools@v2
+        with:
+          rtools-version: '44'
           
       - name: Install R package dependencies
         run: |
@@ -30,15 +35,15 @@ jobs:
       - name: Build binary package
         run: R CMD INSTALL --build .
         
-      - name: Upload macOS binary package
+      - name: Upload Windows binary package
         uses: actions/upload-artifact@v4
         with:
-          name: beehave-go-r-macos
-          path: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
+          name: beehave-go-r-windows
+          path: "D:/a/beehave-go-r/beehave.go.r_*.zip"
           
       - name: Create Release and Upload Asset (if tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: "/Users/runner/work/beehave-go-r/beehave.go.r_*.tgz"
-          
+          files: "D:/a/beehave-go-r/beehave.go.r_*.zip"
+    
