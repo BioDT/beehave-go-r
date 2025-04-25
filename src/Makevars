@@ -6,7 +6,7 @@ libbeecs.so: main.go
 	go env -w GOPROXY=https://proxy.golang.org,direct
 	echo "module beehave-go-r" > go.mod
 	echo "" >> go.mod
-	echo "go 1.18" >> go.mod
+	echo "go 1.21" >> go.mod
 	echo "" >> go.mod
 	echo "require (" >> go.mod
 	echo "	github.com/mlange-42/arche v0.14.0" >> go.mod
