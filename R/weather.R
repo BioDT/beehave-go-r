@@ -20,9 +20,9 @@
 #' experiment <- beehave_init()
 #'
 #' # Create a weather vector with mostly no foraging (0 hours)
-#' # but 10 random days with 20 hours of foraging time
+#' # but 90 random days with 15 hours of foraging time
 #' weather_vector <- rep(0, 365)
-#' weather_vector[sample(1:365, 10)] <- 20
+#' weather_vector[sample(70:265, 90)] <- 15
 #'
 #' # Add weather data to the experiment
 #' experiment <- add_weather_vector(experiment, weather_vector)
@@ -34,14 +34,14 @@
 #'
 add_weather_vector <- function(
   experiment,
-  weather_vector = NULL
+  weather_vector
 ) {
   # Reshape weather vector to multiple of 365
   weather_length <- length(weather_vector)
   weather_ind <- 1:(floor(weather_length / 365) * 365)
-  weather_input <- list(Years = matrix(weather_vector[weather_ind], nrow = 1))
+  weather_input <- matrix(weather_vector[weather_ind], nrow = 1)
 
-  experiment["ForagingPeriod"] <- weather_input
+  experiment[["ForagingPeriod"]][["Years"]] <- weather_input
 
   return(experiment)
 }
