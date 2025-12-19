@@ -108,13 +108,16 @@ add_flower_patches_from_map <- function(
 ) {
   stopifnot("beehave.experiment" %in% class(experiment))
 
-  experiment[["InitialPatches"]][["Patches"]] <- flower_patches_from_map(
+   temp <- flower_patches_from_map(
     landuse_map,
     lookup_table,
     location,
     buffer_size,
     polygon_size
   )
+
+  experiment[["InitialPatches"]][["Patches"]] <- temp$flower_patches
+  experiment[["Colony"] ] <- temp$colony
   return(experiment)
 }
 
@@ -151,6 +154,8 @@ flower_patches_from_map <- function(
     crs = "EPSG:4326"
   ) |>
     terra::project(terra::crs(input_map))
+
+  bee_coords <- terra::crds(bee_location)
 
   # Read lookup table
   if (is.character(lookup_table)) {
@@ -321,7 +326,17 @@ flower_patches_from_map <- function(
     }
   }
 
-  return(flower_patches)
+  colony <- list(
+    Coords = list(
+      X = bee_coords[1, 1],
+      Y = bee_coords[1, 2]
+    )
+  )
+
+  return(list(
+    flower_patches = flower_patches,
+    colony =  colony)
+    )
 }
 
 

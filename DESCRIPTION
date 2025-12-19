@@ -12,10 +12,9 @@ Description: An R interface to the 'beecs' honeybee colony simulation model. Thi
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     terra,
-    tmap,
     sf,
     dplyr,
     utils,
@@ -23,5 +22,7 @@ Imports:
     echarty,
     stringr,
     readr,
-    rdwd
+    rdwd,
+    leaflet,
+    htmlwidgets
 SystemRequirements: Go (>= 1.21)
