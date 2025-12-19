@@ -1,16 +1,14 @@
 module beehave-go-r
 
-go 1.22.0
-
-toolchain go1.24.2
+go 1.24.0
 
 require (
-	github.com/mlange-42/arche v0.14.0
-	github.com/mlange-42/beecs v0.5.0
+	github.com/mlange-42/ark v0.4.3
+	github.com/mlange-42/beecs v0.5.1-0.20250804102929-4faad26fd354
 )
 
 require (
-	github.com/mlange-42/arche-model v0.9.0 // indirect
-	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
+	github.com/mlange-42/ark-tools v0.1.3 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	gonum.org/v1/gonum v0.15.0 // indirect
 )

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/mlange-42/arche/ecs"
+	"github.com/mlange-42/ark/ecs"
 	"github.com/mlange-42/beecs/model"
 	"github.com/mlange-42/beecs/obs"
 	"github.com/mlange-42/beecs/params"
