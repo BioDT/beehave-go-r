@@ -1210,7 +1210,7 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.8.4",
+      "Version": "1.8.7",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1240,7 +1240,7 @@
     },
     "terra": {
       "Package": "terra",
-      "Version": "1.8-42",
+      "Version": "1.8-86",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
