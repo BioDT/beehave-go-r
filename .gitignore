@@ -69,3 +69,5 @@ src/beecs.o
 src/libbeecs.a
 src/libbeecs.h
 src/beehave.go.r.so
+go.mod
+go.sum
