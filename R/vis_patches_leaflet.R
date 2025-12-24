@@ -75,7 +75,7 @@ plot_patches_map <- function(experiment, colors = NULL, opacity = 0.8) {
     }
 
     colors <- stats::setNames(
-      default_colors[seq_len(length(unique_types))],
+      default_colors[seq_along(unique_types)],
       unique_types
     )
   }
