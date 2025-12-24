@@ -67,7 +67,8 @@ add_flower_patches <- function(
 #' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
 #' @param location A data frame with lat and lon columns specifying the location for experiments
 #' @param buffer_size The buffer size in meters around the location (default: 2000)
-#' @param polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @parammax_polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @param min_polygon_size The minimum size of polygons in square meters to include (default: 0)
 #'
 #' @return Return Beehave experiment list
 #' @export
@@ -104,7 +105,8 @@ add_flower_patches_from_map <- function(
   lookup_table,
   location,
   buffer_size = 2000,
-  polygon_size = 200000
+ max_polygon_size = 200000,
+  min_polygon_size = 0
 ) {
   stopifnot("beehave.experiment" %in% class(experiment))
 
@@ -113,7 +115,8 @@ add_flower_patches_from_map <- function(
     lookup_table,
     location,
     buffer_size,
-    polygon_size
+   max_polygon_size,
+    min_polygon_size
   )
 
   experiment[["InitialPatches"]][["Patches"]] <- temp$flower_patches
@@ -130,7 +133,8 @@ add_flower_patches_from_map <- function(
 #' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
 #' @param location A data frame with lat and lon columns specifying the location for experiments
 #' @param buffer_size The buffer size in meters around the location (default: 2000)
-#' @param polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @parammax_polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @param min_polygon_size The minimum size of polygons in square meters to include (default: 0)
 #'
 #' @return A list of flower patches
 #'
@@ -143,7 +147,8 @@ flower_patches_from_map <- function(
   lookup_table,
   location,
   buffer_size = 2000,
-  polygon_size = 200000
+ max_polygon_size = 200000,
+  min_polygon_size = 0
 ) {
   # Read input map
   input_map <- terra::rast(landuse_map)
@@ -225,6 +230,15 @@ flower_patches_from_map <- function(
   )
   terra::values(location_polygons) <- poly_attrs
 
+  # Filter small polygons
+  if (min_polygon_size > 0) {
+    location_polygons <- location_polygons[poly_attrs$size_sqm >= min_polygon_size]
+    if (nrow(location_polygons) == 0) {
+      warning("No flower patches found in the landuse map after filtering by size")
+      return(list())
+    }
+  }
+
   # Process polygons by patch type
   for (patch in patch_types) {
     # Get polygons of this type
@@ -243,9 +257,9 @@ flower_patches_from_map <- function(
       single_poly <- type_polys[i]
       single_area <- terra::expanse(single_poly)
 
-      if (single_area > polygon_size) {
+      if (single_area >max_polygon_size) {
         # Split large polygons
-        sub_polys <- split_polygon(single_poly, polygon_size)
+        sub_polys <- split_polygon(single_poly,max_polygon_size)
 
         # Add attributes to subpolygons
         if (length(sub_polys) > 0) {
