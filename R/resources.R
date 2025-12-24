@@ -67,7 +67,7 @@ add_flower_patches <- function(
 #' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
 #' @param location A data frame with lat and lon columns specifying the location for experiments
 #' @param buffer_size The buffer size in meters around the location (default: 2000)
-#' @parammax_polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @param max_polygon_size The maximum size of polygons in square meters (default: 200000)
 #' @param min_polygon_size The minimum size of polygons in square meters to include (default: 0)
 #'
 #' @return Return Beehave experiment list
@@ -133,7 +133,7 @@ add_flower_patches_from_map <- function(
 #' @param lookup_table A data frame or path to a CSV file containing the lookup table for flower patch properties
 #' @param location A data frame with lat and lon columns specifying the location for experiments
 #' @param buffer_size The buffer size in meters around the location (default: 2000)
-#' @parammax_polygon_size The maximum size of polygons in square meters (default: 200000)
+#' @param max_polygon_size The maximum size of polygons in square meters (default: 200000)
 #' @param min_polygon_size The minimum size of polygons in square meters to include (default: 0)
 #'
 #' @return A list of flower patches
